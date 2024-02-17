@@ -3,7 +3,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
@@ -19,7 +26,8 @@ const SigninForm = () => {
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
 
   // Query
-  const { mutateAsync: signInAccount, isLoading } = useSignInAccount();
+  const { mutateAsync: signInAccount, isPending: isLoading } =
+    useSignInAccount();
 
   const form = useForm<z.infer<typeof SigninValidation>>({
     resolver: zodResolver(SigninValidation),
@@ -34,7 +42,7 @@ const SigninForm = () => {
 
     if (!session) {
       toast({ title: "Login failed. Please try again." });
-      
+
       return;
     }
 
@@ -45,8 +53,8 @@ const SigninForm = () => {
 
       navigate("/");
     } else {
-      toast({ title: "Login failed. Please try again.", });
-      
+      toast({ title: "Login failed. Please try again." });
+
       return;
     }
   };
@@ -64,7 +72,8 @@ const SigninForm = () => {
         </p>
         <form
           onSubmit={form.handleSubmit(handleSignin)}
-          className="flex flex-col gap-5 w-full mt-4">
+          className="flex flex-col gap-5 w-full mt-4"
+        >
           <FormField
             control={form.control}
             name="email"
@@ -107,7 +116,8 @@ const SigninForm = () => {
             Don&apos;t have an account?
             <Link
               to="/sign-up"
-              className="text-primary-500 text-small-semibold ml-1">
+              className="text-primary-500 text-small-semibold ml-1"
+            >
               Sign up
             </Link>
           </p>

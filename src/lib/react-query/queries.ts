@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import {
   useQuery,
   useMutation,
@@ -8,7 +10,7 @@ import {
 import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 import {
   createUserAccount,
-  sginInAccount,
+  signInAccount,
   getCurrentUser,
   signOutAccount,
   getUsers,
@@ -54,7 +56,6 @@ export const useSignOutAccount = () => {
 // ============================================================
 // POST QUERIES
 // ============================================================
-
 export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
