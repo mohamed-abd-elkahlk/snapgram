@@ -141,7 +141,7 @@ export async function createPost(post: INewPost) {
       appwriteConfig.postCollectionId,
       ID.unique(),
       {
-        creator: post.userId,
+        creators: post.userId,
         caption: post.caption,
         imageUrl: fileUrl,
         imageId: uploadedFile.$id,
