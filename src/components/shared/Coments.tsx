@@ -79,7 +79,11 @@ const Coments = ({
         </form>
       </Form>
       <div className="mt-6 border p-6 rounded-lg">
-        {coments?.length != 0 ? (
+        {coments?.length == 0 ? (
+          <div>
+            <h1>no one has coment this post be the first one </h1>
+          </div>
+        ) : (
           coments?.map((coment) => (
             <ComentsCard
               key={coment.$id}
@@ -87,10 +91,6 @@ const Coments = ({
               userId={coment.userId}
             />
           ))
-        ) : (
-          <div>
-            <h1>no one has coment this post be the first one </h1>
-          </div>
         )}
       </div>
     </div>
