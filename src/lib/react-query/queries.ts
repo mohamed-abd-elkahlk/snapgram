@@ -27,8 +27,15 @@ import {
   searchPosts,
   savePost,
   deleteSavedPost,
+  addComent,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import {
+  IContent,
+  INewPost,
+  INewUser,
+  IUpdatePost,
+  IUpdateUser,
+} from "@/types";
 
 // ============================================================
 // AUTH QUERIES
@@ -59,8 +66,10 @@ export const useSignOutAccount = () => {
 export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-    queryFn: getInfinitePosts as any,
-    getNextPageParam: (lastPage: any) => {
+    queryFn: getInfinitePosts as romise<
+      Models.DocumentList<Models.Document> | undefined
+    >,
+    getNextPageParam: (lastPage: number) => {
       // If there's no data, there are no more pages.
       if (lastPage && lastPage.documents.length === 0) {
         return null;
@@ -242,6 +251,22 @@ export const useUpdateUser = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, data?.$id],
       });
+    },
+  });
+};
+
+export const useAddComents = (postId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (content: IContent) => {
+      return addComent({
+        content: content.content,
+        posts: content.posts,
+        userId: content.userId,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries([QUERY_KEYS.GET_POST_BY_ID, postId]);
     },
   });
 };

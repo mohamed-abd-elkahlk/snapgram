@@ -1,7 +1,13 @@
 import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import {
+  IUpdatePost,
+  INewPost,
+  INewUser,
+  IUpdateUser,
+  IContent,
+} from "@/types";
 
 // ============================================================
 // AUTH
@@ -415,7 +421,7 @@ export async function getUserPosts(userId?: string) {
     const post = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
+      [Query.equal("creators", userId), Query.orderDesc("$createdAt")]
     );
 
     if (!post) throw Error;
@@ -540,6 +546,26 @@ export async function updateUser(user: IUpdateUser) {
     }
 
     return updatedUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+// ============================== ADD COMENTS
+
+export async function addComent(content: IContent) {
+  try {
+    const newComent = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.comentsCollectionId,
+      ID.unique(),
+      {
+        content: content.content,
+        userId: content.userId,
+        posts: content.posts,
+      }
+    );
+    if (!newComent) throw Error;
+    return newComent;
   } catch (error) {
     console.log(error);
   }

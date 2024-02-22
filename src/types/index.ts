@@ -46,3 +46,9 @@ export type INewUser = {
   username: string;
   password: string;
 };
+
+export type IContent = {
+  content: string;
+  userId?: string;
+  posts?: string;
+};

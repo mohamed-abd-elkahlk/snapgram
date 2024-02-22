@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui";
-import { Loader } from "@/components/shared";
+import { Coments, Loader } from "@/components/shared";
 import { GridPostList, PostStats } from "@/components/shared";
 
 import {
@@ -142,7 +142,7 @@ const PostDetails = () => {
           </div>
         </div>
       )}
-
+      <Coments postId={post?.$id} userId={user.id} coments={post?.coments} />
       <div className="w-full max-w-5xl">
         <hr className="border w-full border-dark-4/80" />
 
