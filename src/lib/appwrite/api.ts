@@ -8,6 +8,7 @@ import {
   IUpdateUser,
   IContent,
 } from "@/types";
+import { URL } from "url";
 
 // ============================================================
 // AUTH
@@ -183,47 +184,14 @@ export async function uploadFile(file: File) {
 }
 
 // ============================== GET FILE URL
-export async function getFilePreview(
-  fileId: string
-): Promise<string | undefined> {
+export async function getFileView(fileId: string): Promise<string | undefined> {
   if (!fileId) return undefined;
 
   try {
-    // try the preview (may throw 403 if plan blocks transformations)
-    const previewUrl = storage.getFilePreview(
-      appwriteConfig.storageId,
-      fileId,
-      2000, // width
-      2000, // height
-      "top", // gravity
-      100 // quality
-    );
-    if (previewUrl) {
-      return previewUrl.href;
-    }
-  } catch (err: any) {
-    // If it's the Appwrite "image transformations blocked" error or 403 -> fallback
-    const blocked =
-      err?.type === "storage_image_transformations_blocked" ||
-      err?.code === 403 ||
-      (err?.response && err.response?.status === 403);
-
-    if (!blocked) {
-      // Unexpected error — rethrow/log so it isn't silently swallowed
-      console.error("getFilePreview error (unexpected):", err);
-      throw err;
-    }
-
-    // otherwise, fall through to try / return a non-transformed URL
-    console.warn(
-      "Preview blocked by plan — falling back to original file view."
-    );
-  }
-
-  // fallback: return the original file URL (no transformations)
-  try {
-    const viewUrl = storage.getFileView(appwriteConfig.storageId, fileId);
-    return viewUrl.toString();
+    const viewUrl = await storage.getFileView(appwriteConfig.storageId, fileId);
+    return viewUrl && (viewUrl as URL).href
+      ? (viewUrl as URL).href
+      : String(viewUrl);
   } catch (err) {
     console.error("Failed to get file view:", err);
     return undefined;
