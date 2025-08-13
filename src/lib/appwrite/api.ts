@@ -183,22 +183,50 @@ export async function uploadFile(file: File) {
 }
 
 // ============================== GET FILE URL
-export function getFilePreview(fileId: string) {
+export async function getFilePreview(
+  fileId: string
+): Promise<string | undefined> {
+  if (!fileId) return undefined;
+
   try {
-    const fileUrl = storage.getFilePreview(
+    // try the preview (may throw 403 if plan blocks transformations)
+    const previewUrl = storage.getFilePreview(
       appwriteConfig.storageId,
       fileId,
-      2000,
-      2000,
-      "top",
-      100
+      2000, // width
+      2000, // height
+      "top", // gravity
+      100 // quality
     );
+    if (previewUrl) {
+      return previewUrl.href;
+    }
+  } catch (err: any) {
+    // If it's the Appwrite "image transformations blocked" error or 403 -> fallback
+    const blocked =
+      err?.type === "storage_image_transformations_blocked" ||
+      err?.code === 403 ||
+      (err?.response && err.response?.status === 403);
 
-    if (!fileUrl) throw Error;
+    if (!blocked) {
+      // Unexpected error — rethrow/log so it isn't silently swallowed
+      console.error("getFilePreview error (unexpected):", err);
+      throw err;
+    }
 
-    return fileUrl;
-  } catch (error) {
-    console.log(error);
+    // otherwise, fall through to try / return a non-transformed URL
+    console.warn(
+      "Preview blocked by plan — falling back to original file view."
+    );
+  }
+
+  // fallback: return the original file URL (no transformations)
+  try {
+    const viewUrl = storage.getFileView(appwriteConfig.storageId, fileId);
+    return viewUrl.toString();
+  } catch (err) {
+    console.error("Failed to get file view:", err);
+    return undefined;
   }
 }
 
@@ -287,7 +315,7 @@ export async function updatePost(post: IUpdatePost) {
       if (!uploadedFile) throw Error;
 
       // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
+      const fileUrl = await getFilePreview(uploadedFile.$id);
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
@@ -508,7 +536,7 @@ export async function updateUser(user: IUpdateUser) {
       if (!uploadedFile) throw Error;
 
       // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
+      const fileUrl = await getFilePreview(uploadedFile.$id);
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
