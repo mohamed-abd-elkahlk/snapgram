@@ -184,7 +184,9 @@ export async function uploadFile(file: File) {
 }
 
 // ============================== GET FILE URL
-export async function getFileView(fileId: string): Promise<string | undefined> {
+export async function getFilePreview(
+  fileId: string
+): Promise<string | undefined> {
   if (!fileId) return undefined;
 
   try {
